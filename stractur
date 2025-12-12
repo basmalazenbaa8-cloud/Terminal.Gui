@@ -1,0 +1,109 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+using namespace std;
+
+struct Student {
+    string name;
+    int roll;
+    int grade;
+    int attendance;
+    Student* next;
+};
+
+class StudentList {
+private:
+    Student* head;
+
+public:
+    StudentList() {
+        head = nullptr;
+    }
+
+    // 1. Add Student
+    void addStudent(string name, int roll, int grade, int attendance) {
+        Student* newNode = new Student();
+        newNode->name = name;
+        newNode->roll = roll;
+        newNode->grade = grade;
+        newNode->attendance = attendance;
+        newNode->next = head;
+        head = newNode;
+    }
+
+    // 2. Search Student
+    Student* searchStudent(int roll) {
+        Student* temp = head;
+        while (temp != nullptr) {
+            if (temp->roll == roll) return temp;
+            temp = temp->next;
+        }
+        return nullptr;
+    }
+
+    // 3. Update Student
+    bool updateStudent(int roll, int grade, int attendance) {
+        Student* s = searchStudent(roll);
+        if (s == nullptr) return false;
+
+        s->grade = grade;
+        s->attendance = attendance;
+        return true;
+    }
+
+    // 4. Delete Student
+    bool deleteStudent(int roll) {
+        Student* temp = head;
+        Student* prev = nullptr;
+
+        while (temp != nullptr) {
+            if (temp->roll == roll) {
+                if (prev == nullptr) {
+                    head = temp->next;
+                } else {
+                    prev->next = temp->next;
+                }
+                delete temp;
+                return true;
+            }
+            prev = temp;
+            temp = temp->next;
+        }
+        return false;
+    }
+
+    // 5. Display Students
+    void displayAll() {
+        Student* temp = head;
+        while (temp != nullptr) {
+            cout << temp->name << " - " << temp->roll << " - "
+                 << temp->grade << " - " << temp->attendance << endl;
+            temp = temp->next;
+        }
+    }
+
+    // 6. Export to file
+    void exportData() {
+        ofstream file("students.csv");
+        Student* temp = head;
+        while (temp != nullptr) {
+            file << temp->name << "," << temp->roll << "," 
+                 << temp->grade << "," << temp->attendance << "\n";
+            temp = temp->next;
+        }
+        file.close();
+    }
+
+    // 7. Import from file
+    void importData() {
+        ifstream file("students.csv");
+        string name;
+        int roll, grade, attendance;
+        char c;
+
+        while (file >> name >> c >> roll >> c >> grade >> c >> attendance) {
+            addStudent(name, roll, grade, attendance);
+        }
+        file.close();
+    }
+};
